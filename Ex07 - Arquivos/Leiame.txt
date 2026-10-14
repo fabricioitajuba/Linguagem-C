@@ -1,0 +1,98 @@
+A função fseek serve para movimentar o ponteiro (cursor) 
+de leitura e escrita de um arquivo para uma posição 
+específica. Isso permite que você faça acessos aleatórios 
+ao arquivo, ou seja, ler ou escrever em qualquer lugar dele
+sem precisar passar por todo o conteúdo do início ao fim.
+
+## A Sintaxe da Função:
+
+int fseek(FILE *ponteiro_do_arquivo, long deslocamento, int origem);
+
+
+1. ponteiro_do_arquivo: O arquivo retornado pelo fopen.
+
+2. deslocamento: Quantos bytes (caracteres) você quer mover. Pode ser positivo (para frente) ou negativo (para trás).
+
+3. origem: De onde você quer começar a contar o deslocamento. Existem 3 constantes padrão para isso:
+
+	• SEEK_SET: Começo do arquivo.
+	• SEEK_CUR: Posição atual do ponteiro.
+	• SEEK_END: Final do arquivo.
+
+
+## Os 4 Casos de Uso Mais Comuns:
+
+1. Ir para o início do arquivo
+
+Move o cursor para o byte zero, contando a partir do começo do arquivo. 
+(Equivale à função rewind(arquivo)).
+
+fseek(arquivo, 0, SEEK_SET);
+
+
+2. Pular os primeiros X bytes do arquivo
+
+Move o cursor para o quinto caractere/byte do arquivo, contando a partir do início.
+
+fseek(arquivo, 5, SEEK_SET);
+
+
+3. Avançar ou retroceder a partir de onde o cursor já está
+
+Se você acabou de ler uma palavra e quer pular as próximas 10 letras (avançar):
+
+fseek(arquivo, 10, SEEK_CUR);
+
+Se você leu algo e quer voltar 3 bytes para ler de novo (retroceder):
+
+fseek(arquivo, -3, SEEK_CUR);
+
+
+4. Ir para o final (ou voltar alguns bytes antes do final)
+
+Ir exatamente para o último byte:
+
+fseek(arquivo, 0, SEEK_END);
+
+Ir para a posição correspondente a 10 bytes antes do fim do arquivo:
+
+fseek(arquivo, -10, SEEK_END);
+
+
+
+Exemplo Prático: Modificando um caractere no meio do arquivo
+
+Imagine que temos um arquivo chamado texto.txt com a palavra "Gato". 
+Vamos usar o fseek para alterar para "Guto" sem reescrever o arquivo inteiro.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    // Abre criando o arquivo com a palavra "Gato" para o teste
+    FILE *arquivo = fopen("texto.txt", "w+");
+    if (arquivo == NULL) return 1;
+    fprintf(arquivo, "Gato"); 
+
+    // O arquivo agora contém:
+    // Posição 0: 'G'
+    // Posição 1: 'a'  <-- Queremos mudar este!
+    // Posição 2: 't'
+    // Posição 3: 'o'
+
+    // 1. Posiciona o cursor exatamente na posição 1 a partir do início (SEEK_SET)
+    fseek(arquivo, 1, SEEK_SET);
+
+    // 2. Escreve a nova letra por cima da antiga
+    fputc('u', arquivo); 
+
+    // 3. Volta para o início para ler o resultado na tela
+    fseek(arquivo, 0, SEEK_SET);
+
+    char resultado[10];
+    fgets(resultado, sizeof(resultado), arquivo);
+    printf("Conteúdo atual do arquivo: %s\n", resultado); // Vai exibir: Guto
+
+    fclose(arquivo);
+    return 0;
+}

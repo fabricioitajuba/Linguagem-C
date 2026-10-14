@@ -5,57 +5,138 @@
  * Para limpar: make clean
  *--------------------------------------------------*/
 #include <stdio.h>
-//#include <stdlib.h>
+
+void CRUD_Create(void);
+void CRUD_Read(void);
+void CRUD_Update(void);
+void CRUD_Delete(void);
+void CRUD_List(void);
 
 int main() {
 
-    // Limpa a tela do terminal
-    //system("clear"); 
-    printf("\e[1J\e[H"); 
+    char opcao;
 
-    // Exibe o menu na tela
-    printf("---------------------------------\n");
-    printf("### CRUD versao 1.0, 13/10/2026\n");
-    printf("---------------------------------\n");
-    printf("\n- O que Voce deseja?\n\n");
-    printf("C - Criar um registro;\n");
-    printf("R - Ler um registro;\n");
-    printf("U - Atualizar um registro;\n");
-    printf("D - Deletar um registro;\n");
-    printf("L - Listar todos os registros;\n");
-    printf("Q - Sair;\n");
+    do{
 
-    int opcao;
+        // Limpa a tela do terminal
+        printf("\e[1J\e[H"); 
 
-    do {
-        
-        // Lê a opção digitada pelo usuário
-        if (scanf("%d", &opcao) != 1) {
-            // Limpa o buffer caso o usuário digite uma letra por engano (evita loop infinito)
-            while (getchar() != '\n');
-            printf("\nErro: Por favor, digite um numero valido.\n");
-            continue;
-        }
+        // Exibe o menu na tela
+        printf("---------------------------------\n");
+        printf("### CRUD versao 1.0, 13/10/2026\n");
+        printf("---------------------------------\n");
+        printf("\n- O que Voce deseja?\n\n");
+        printf("C - Criar um registro;\n");
+        printf("R - Ler um registro;\n");
+        printf("U - Atualizar um registro;\n");
+        printf("D - Deletar um registro;\n");
+        printf("L - Listar todos os registros;\n");
+        printf("Q - Sair;\n");
+        printf(">>");
 
-        // Executa a ação baseada na escolha
-        switch (opcao) {
-            case 1:
-                printf("\n[Mensagem A] Voce selecionou a primeira opcao!\n");
+        scanf(" %c", &opcao);
+
+        switch(opcao){
+            case 'C':
+            case 'c':
+                CRUD_Create();                
                 break;
-            case 2:
-                printf("\n[Mensagem B] Esta e a segunda mensagem do sistema.\n");
+            case 'R':
+            case 'r':
+                CRUD_Read();
+                break;
+            case 'U':
+            case 'u':
+                CRUD_Update();
+                break;
+            case 'D':
+            case 'd':
+                CRUD_Delete();
+                break;
+            case 'L':
+            case 'l':
+                CRUD_List();
                 break;
             case 'Q':
             case 'q':
                 printf("\nSaindo do programa... Ate logo!\n");
                 break;
             default:
-                printf("\nOpcao invalida! Tente novamente com 1, 2 or 3.\n");
+                printf("\nOpcao invalida!\n");
                 break;
         }
 
-    } while (opcao != 'Q' && opcao != 'q'); // O loop continua rodando enquanto a opção não for Q
+    }while(opcao != 'Q' && opcao != 'q'); // O loop continua rodando enquanto a opção não for Q
 
     return 0;
 }
 
+/***************************************
+ * Função para criar um novo registro
+ ***************************************/
+void CRUD_Create(void){
+
+    FILE *arquivo = fopen("registros.txt", "w+");
+
+    if(arquivo == NULL){
+        printf("Erro ao abrir ou criar o arquivo!\n");
+        return 1;
+    }
+
+    printf("\nC - Criar um registro:\n");
+
+    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n'); 
+    getchar();
+
+
+
+}
+
+/***************************************
+ * Função para ler um novo registro
+ ***************************************/
+void CRUD_Read(void){
+
+    printf("\nR - Ler um registro:\n");
+
+    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n'); 
+    getchar();
+}
+
+/***************************************
+ * Função para atualizar um novo registro
+ ***************************************/
+void CRUD_Update(void){
+
+    printf("\nU - Atualizar um registro:\n");
+
+    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n'); 
+    getchar();
+}
+
+/***************************************
+ * Função para deletar um novo registro
+ ***************************************/
+void CRUD_Delete(void){
+
+    printf("\nD - Deletar um registro:\n");
+
+    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n'); 
+    getchar();
+}
+
+/***************************************
+ * Função para listar um novo registro
+ ***************************************/
+void CRUD_List(void){
+
+    printf("\nL - Listar registros:\n");
+
+    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n'); 
+    getchar();
+}
