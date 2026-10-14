@@ -6,7 +6,7 @@
  *--------------------------------------------------*/
 #include <stdio.h>
 
-void CRUD_Create(void);
+int CRUD_Create(void);
 void CRUD_Read(void);
 void CRUD_Update(void);
 void CRUD_Delete(void);
@@ -74,23 +74,33 @@ int main() {
 /***************************************
  * Função para criar um novo registro
  ***************************************/
-void CRUD_Create(void){
-
-    FILE *arquivo = fopen("registros.txt", "w+");
-
-    if(arquivo == NULL){
-        printf("Erro ao abrir ou criar o arquivo!\n");
-        return 1;
-    }
+int CRUD_Create(void){
 
     printf("\nC - Criar um registro:\n");
 
-    // Limpa o buffer residual e espera o próximo Enter do usuário
     while (getchar() != '\n'); 
     getchar();
 
+    //Tenta abrir o arquivo "registros.txt" no modo de leitura e escrita
+    FILE *arquivo = fopen("registros.txt", "r+");
 
+    if(arquivo == NULL){
 
+        //Caso não exista, cria o arquivo no modo de escrita e leitura
+        arquivo = fopen("registros.txt", "w+");
+        
+        if(arquivo == NULL){
+            //printf("Erro crítico: Não foi possível criar o arquivo.\n");
+            return 1;
+        }        
+    }
+
+    // Posiciona o ponteiro no FINAL do arquivo
+    fseek(arquivo, 0, SEEK_END);
+    
+    fprintf(arquivo, "Esse é o texto que será inserido!\n");
+
+    fclose(arquivo);
 }
 
 /***************************************

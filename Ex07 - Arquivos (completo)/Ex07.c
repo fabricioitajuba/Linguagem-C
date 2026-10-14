@@ -29,15 +29,15 @@ int main() {
         printf("Arquivo existente aberto com sucesso para leitura e escrita!\n");
     }
 
-    // 1. Posiciona o ponteiro no FINAL do arquivo
+    // Posiciona o ponteiro no FINAL do arquivo
     // 0 = zero bytes de deslocamento a partir do final (SEEK_END)
     fseek(arquivo, 0, SEEK_END);
 
     // 1. Escrevendo no arquivo
     fprintf(arquivo, "Esse é o texto que será inserido!\n");
 
-    // 1. Posiciona o ponteiro no FINAL do arquivo
-    // 0 = zero bytes de deslocamento a partir do final (SEEK_END)
+    // Posiciona o ponteiro no INICIO do arquivo
+    // 0 = zero bytes de deslocamento a partir do início (SEEK_SET)
     fseek(arquivo, 0, SEEK_SET);
 
     // 3. Lendo o conteúdo do arquivo
