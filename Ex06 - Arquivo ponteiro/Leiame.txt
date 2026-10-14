@@ -1,0 +1,6 @@
+gcc programa.c -o meu_programa
+
+
+
+
+sudo apt update && sudo apt install build-essential
