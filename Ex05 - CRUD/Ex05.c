@@ -159,7 +159,7 @@ int CRUD_Create(void){
 }
 
 /***************************************
- * Função para ler um novo registro
+ * Função para ler um registro
  ***************************************/
 void CRUD_Read(void){
 
@@ -171,7 +171,7 @@ void CRUD_Read(void){
 }
 
 /***************************************
- * Função para atualizar um novo registro
+ * Função para atualizar um registro
  ***************************************/
 void CRUD_Update(void){
 
@@ -183,7 +183,7 @@ void CRUD_Update(void){
 }
 
 /***************************************
- * Função para deletar um novo registro
+ * Função para deletar um registro
  ***************************************/
 void CRUD_Delete(void){
 
@@ -195,7 +195,7 @@ void CRUD_Delete(void){
 }
 
 /***************************************
- * Função para listar um novo registro
+ * Função para listar os registros
  ***************************************/
 void CRUD_List(void){
 
