@@ -3,14 +3,27 @@
  * Autor: Fabrício Ribeiro
  * Para compilar: make
  * Para limpar: make clean
+ * 
+ * Create: não concluído
+ * Read: não concluído
+ * Update: não concluído
+ * Delete: não concluído
+ * List: não concluído
  *--------------------------------------------------*/
 #include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 int CRUD_Create(void);
 void CRUD_Read(void);
 void CRUD_Update(void);
 void CRUD_Delete(void);
 void CRUD_List(void);
+
+struct Pessoa {
+    char nome[34];
+    char idade[3];
+};
 
 int main() {
 
@@ -76,31 +89,73 @@ int main() {
  ***************************************/
 int CRUD_Create(void){
 
-    printf("\nC - Criar um registro:\n");
+    char opcao, data_str[11], hora_str[9];
 
-    while (getchar() != '\n'); 
-    getchar();
+    struct Pessoa pessoa;
+    time_t tempo_bruto;
+    struct tm *info_tempo;
 
-    //Tenta abrir o arquivo "registros.txt" no modo de leitura e escrita
-    FILE *arquivo = fopen("registros.txt", "r+");
+    printf("\nC - Criar um registro:\n\n");
 
-    if(arquivo == NULL){
+    //while (getchar() != '\n'); 
+    //getchar();
 
-        //Caso não exista, cria o arquivo no modo de escrita e leitura
-        arquivo = fopen("registros.txt", "w+");
-        
+    // Limpa o lixo que outros menus ou comandos deixaram no teclado.
+    while (getchar() != '\n' && getchar() != EOF); 
+
+    // Leitura do Nome
+    printf("Digite o nome: ");
+    fgets(pessoa.nome, sizeof(pessoa.nome), stdin);
+    pessoa.nome[strcspn(pessoa.nome, "\n")] = '\0'; // Remove o '\n'
+
+    // Leitura da Idade como String
+    printf("Digite a idade: ");
+    fgets(pessoa.idade, sizeof(pessoa.idade), stdin);
+    pessoa.idade[strcspn(pessoa.idade, "\n")] = '\0'; // Remove o '\n'
+
+    // Obtém o tempo atual do sistema
+    time(&tempo_bruto);
+
+    // Converte para a estrutura de hora local do Linux
+    info_tempo = localtime(&tempo_bruto);
+
+    // Formata a DATA (Garante tamanho padrão de 10 caracteres)
+    strftime(data_str, sizeof(data_str), "%d/%m/%Y", info_tempo);
+
+    // Formata a HORA (Garante tamanho padrão de 8 caracteres)
+    strftime(hora_str, sizeof(hora_str), "%H:%M:%S", info_tempo);
+
+    printf("Deseja salvar o registro? (S/N): ");
+    scanf(" %c", &opcao);
+
+    if(opcao == 'S' || opcao == 's'){
+
+        //Tenta abrir o arquivo "registros.txt" no modo de leitura e escrita
+        FILE *arquivo = fopen("registros.txt", "r+");
+
         if(arquivo == NULL){
-            //printf("Erro crítico: Não foi possível criar o arquivo.\n");
-            return 1;
-        }        
+
+            //Caso não exista, cria o arquivo no modo de escrita e leitura
+            arquivo = fopen("registros.txt", "w+");
+            
+            if(arquivo == NULL){
+                //printf("Erro crítico: Não foi possível criar o arquivo.\n");
+                return 1;
+            }        
+        }
+
+        fseek(arquivo, 0, SEEK_END);
+        
+        fprintf(arquivo, "%s %s %-50s %-3s\n", data_str, hora_str, pessoa.nome, pessoa.idade);
+
+        fclose(arquivo);
+
+        printf("Registro salvo.\n");
+    }
+    else{
+        printf("Registro não salvo.\n");
     }
 
-    // Posiciona o ponteiro no FINAL do arquivo
-    fseek(arquivo, 0, SEEK_END);
-    
-    fprintf(arquivo, "Esse é o texto que será inserido!\n");
-
-    fclose(arquivo);
 }
 
 /***************************************

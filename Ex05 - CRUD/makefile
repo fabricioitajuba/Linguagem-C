@@ -16,3 +16,4 @@ $(TARGET): $(Nome).c
 # Regra para limpar os arquivos gerados
 clean:
 	rm -f $(TARGET)
+	#rm -f registros.txt
