@@ -23,6 +23,8 @@ void CRUD_List(void);
 struct Pessoa {
     char nome[36];
     char idade[4];
+    char data_str[11];
+    char hora_str[9];
 };
 
 int main() {
@@ -89,7 +91,8 @@ int main() {
  ***************************************/
 int CRUD_Create(void){
 
-    char opcao, data_str[11], hora_str[9];
+    //char opcao, data_str[11], hora_str[9];
+    char opcao;
 
     short int id;
 
@@ -122,10 +125,10 @@ int CRUD_Create(void){
     info_tempo = localtime(&tempo_bruto);
 
     // Formata a DATA (Garante tamanho padrão de 10 caracteres)
-    strftime(data_str, sizeof(data_str), "%d/%m/%Y", info_tempo);
+    strftime(pessoa.data_str, sizeof(pessoa.data_str), "%d/%m/%Y", info_tempo);
 
     // Formata a HORA (Garante tamanho padrão de 8 caracteres)
-    strftime(hora_str, sizeof(hora_str), "%H:%M:%S", info_tempo);
+    strftime(pessoa.hora_str, sizeof(pessoa.hora_str), "%H:%M:%S", info_tempo);
 
     printf("Deseja salvar o registro? (S/N): ");
     scanf(" %c", &opcao);
@@ -150,7 +153,7 @@ int CRUD_Create(void){
         
         id = ftell(arquivo) / 64 + 1; // Calcula o ID com base no tamanho do arquivo
 
-        fprintf(arquivo, "%03hd %s %s %-35s %-3s\n", id, data_str, hora_str, pessoa.nome, pessoa.idade);
+        fprintf(arquivo, "%03hd %s %s %-35s %-3s\n", id, pessoa.data_str, pessoa.hora_str, pessoa.nome, pessoa.idade);
 
         fclose(arquivo);
 
@@ -211,12 +214,14 @@ int CRUD_Read(void){
     // Finaliza a string de forma segura
     buffer[bytes_lidos] = '\0';    
 
-    // 3. Extrai as colunas nome e idade do bloco lido na memória
-    int lidos = sscanf(buffer, "%*s %*s %*s %s %s", pessoa.nome, pessoa.idade);
+    // 3. Extrai as colunas data, hora, nome e idade do bloco lido na memória
+    int lidos = sscanf(buffer, "%*s %s %s %s %s", pessoa.data_str, pessoa.hora_str, pessoa.nome, pessoa.idade);
 
-    if(lidos == 2){
+    if(lidos == 4){
         printf("\nNome: %s\n", pessoa.nome);
         printf("Idade: %s\n", pessoa.idade);
+        printf("Data da inclusão: %s\n", pessoa.data_str);
+        printf("Hora da inclusão: %s\n", pessoa.hora_str);
     }
     else{
         printf("Erro ao decodificar as colunas do bloco lido.\n");
