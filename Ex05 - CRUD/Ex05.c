@@ -16,9 +16,9 @@
 
 int CRUD_Create(void);
 int CRUD_Read(void);
-void CRUD_Update(void);
-void CRUD_Delete(void);
-void CRUD_List(void);
+int CRUD_Update(void);
+int CRUD_Delete(void);
+int CRUD_List(void);
 
 struct Pessoa {
     char nome[36];
@@ -30,6 +30,7 @@ struct Pessoa {
 int main() {
 
     char opcao;
+    int retorno;
 
     do{
 
@@ -54,23 +55,23 @@ int main() {
         switch(opcao){
             case 'C':
             case 'c':
-                CRUD_Create();                
+                retorno = CRUD_Create();                
                 break;
             case 'R':
             case 'r':
-                CRUD_Read();
+                retorno = CRUD_Read();
                 break;
             case 'U':
             case 'u':
-                CRUD_Update();
+                retorno = CRUD_Update();
                 break;
             case 'D':
             case 'd':
-                CRUD_Delete();
+                retorno = CRUD_Delete();
                 break;
             case 'L':
             case 'l':
-                CRUD_List();
+                retorno = CRUD_List();
                 break;
             case 'Q':
             case 'q':
@@ -238,7 +239,7 @@ int CRUD_Read(void){
 /***************************************
  * Função para atualizar um registro
  ***************************************/
-void CRUD_Update(void){
+int CRUD_Update(void){
 
     printf("\nU - Atualizar um registro:\n");
 
@@ -250,7 +251,7 @@ void CRUD_Update(void){
 /***************************************
  * Função para deletar um registro
  ***************************************/
-void CRUD_Delete(void){
+int CRUD_Delete(void){
 
     printf("\nD - Deletar um registro:\n");
 
@@ -262,7 +263,7 @@ void CRUD_Delete(void){
 /***************************************
  * Função para listar os registros
  ***************************************/
-void CRUD_List(void){
+int CRUD_List(void){
 
     printf("\nL - Listar registros:\n");
 
