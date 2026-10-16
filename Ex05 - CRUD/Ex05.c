@@ -15,13 +15,13 @@
 #include <time.h>
 
 int CRUD_Create(void);
-void CRUD_Read(void);
+int CRUD_Read(void);
 void CRUD_Update(void);
 void CRUD_Delete(void);
 void CRUD_List(void);
 
 struct Pessoa {
-    char nome[34];
+    char nome[35];
     char idade[3];
 };
 
@@ -91,6 +91,8 @@ int CRUD_Create(void){
 
     char opcao, data_str[11], hora_str[9];
 
+    short int id;
+
     struct Pessoa pessoa;
     time_t tempo_bruto;
     struct tm *info_tempo;
@@ -146,7 +148,9 @@ int CRUD_Create(void){
 
         fseek(arquivo, 0, SEEK_END);
         
-        fprintf(arquivo, "%s %s %-50s %-3s\n", data_str, hora_str, pessoa.nome, pessoa.idade);
+        id = ftell(arquivo) / 64 + 1; // Calcula o ID com base no tamanho do arquivo
+
+        fprintf(arquivo, "%03hd %s %s %-35s %-3s\n", id, data_str, hora_str, pessoa.nome, pessoa.idade);
 
         fclose(arquivo);
 
@@ -161,13 +165,69 @@ int CRUD_Create(void){
 /***************************************
  * Função para ler um registro
  ***************************************/
-void CRUD_Read(void){
+int CRUD_Read(void){
+
+    int id;
 
     printf("\nR - Ler um registro:\n");
 
-    // Limpa o buffer residual e espera o próximo Enter do usuário
+    while (getchar() != '\n' && getchar() != EOF); 
+    
+    printf("\nQual registro deseja ler? ");
+
+    if(scanf("%d", &id) != 1 || id <= 0){
+        printf("Linha invalida.\n");
+        return 1;
+    }    
+
+    long offset = (id - 1) * 64;
+
+    //Tenta abrir o arquivo "registros.txt" no modo de leitura
+    FILE *arquivo = fopen("registros.txt", "r");
+    
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    if(fseek(arquivo, offset, SEEK_SET) != 0) {
+        printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+        fclose(arquivo);
+        return 1;
+    }
+
+    char buffer[65];
+
+    size_t bytes_lidos = fread(buffer, sizeof(char), 64, arquivo);
+
+    if (bytes_lidos == 0) {
+        printf("O ID %d nao existe ou o arquivo terminou.\n", id);
+        fclose(arquivo);
+        return 1;
+    }
+
+    // Finaliza a string de forma segura
+    buffer[bytes_lidos] = '\0';    
+
+    // 3. Extrai as colunas nome e idade do bloco lido na memória
+    char nome[35];
+    char idade[3];
+    int lidos = sscanf(buffer, "%*s %*s %*s %s %s", nome, idade);
+
+    if(lidos == 2){
+        printf("\nNome: %s\n", nome);
+        printf("Idade: %s\n", idade);
+    }
+    else{
+        printf("Erro ao decodificar as colunas do bloco lido.\n");
+    }
+
+    fclose(arquivo);
+
     while (getchar() != '\n'); 
     getchar();
+
+    return 0;
 }
 
 /***************************************
