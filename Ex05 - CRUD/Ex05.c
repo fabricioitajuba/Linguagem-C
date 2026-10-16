@@ -21,8 +21,8 @@ void CRUD_Delete(void);
 void CRUD_List(void);
 
 struct Pessoa {
-    char nome[35];
-    char idade[3];
+    char nome[36];
+    char idade[4];
 };
 
 int main() {
@@ -169,6 +169,8 @@ int CRUD_Read(void){
 
     int id;
 
+    struct Pessoa pessoa;
+
     printf("\nR - Ler um registro:\n");
 
     while (getchar() != '\n' && getchar() != EOF); 
@@ -210,13 +212,11 @@ int CRUD_Read(void){
     buffer[bytes_lidos] = '\0';    
 
     // 3. Extrai as colunas nome e idade do bloco lido na memória
-    char nome[35];
-    char idade[3];
-    int lidos = sscanf(buffer, "%*s %*s %*s %s %s", nome, idade);
+    int lidos = sscanf(buffer, "%*s %*s %*s %s %s", pessoa.nome, pessoa.idade);
 
     if(lidos == 2){
-        printf("\nNome: %s\n", nome);
-        printf("Idade: %s\n", idade);
+        printf("\nNome: %s\n", pessoa.nome);
+        printf("Idade: %s\n", pessoa.idade);
     }
     else{
         printf("Erro ao decodificar as colunas do bloco lido.\n");
