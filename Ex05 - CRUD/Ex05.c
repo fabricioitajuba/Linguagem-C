@@ -4,8 +4,8 @@
  * Para compilar: make
  * Para limpar: make clean
  * 
- * Create: não concluído
- * Read: não concluído
+ * Create: Concluído
+ * Read: Concluído
  * Update: não concluído
  * Delete: não concluído
  * List: não concluído
