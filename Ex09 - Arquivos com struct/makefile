@@ -16,3 +16,6 @@ $(TARGET): $(Nome).c
 # Regra para limpar os arquivos gerados
 clean:
 	rm -f $(TARGET)
+	rm -f Ex09a
+	rm -f Ex09b
+	rm -f clientes.dat
