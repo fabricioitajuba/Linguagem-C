@@ -69,7 +69,7 @@ int insere_notas(void){
 
     arquivo = fopen("alunos.dat", "ab");
 
-    if (arquivo == NULL) {
+    if(arquivo == NULL){
         printf("Erro ao criar o arquivo!\n");
         return 1;
     }
@@ -98,12 +98,12 @@ int consulta_notas(void){
 
     FILE *arquivo = fopen("alunos.dat", "rb");
     
-    if (arquivo == NULL) {
+    if(arquivo == NULL){
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
 
-    if(fseek(arquivo, offset, SEEK_SET) != 0) {
+    if(fseek(arquivo, offset, SEEK_SET) != 0){
         printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
         fclose(arquivo);
         return 1;
