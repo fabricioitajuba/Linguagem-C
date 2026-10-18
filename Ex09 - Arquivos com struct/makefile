@@ -1,4 +1,4 @@
-Nome = Ex09b
+Nome = Ex09a
 # Variáveis para o compilador e flags
 CC = gcc
 CFLAGS = -Wall -Wextra -O2
