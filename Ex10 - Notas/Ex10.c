@@ -22,11 +22,65 @@ struct Aluno{
 //Programa principal
 int main(){
 
+    char opcao;
+    int retorno;
+
     verifica_arquivo();
-    insere_notas();
-    consulta_notas();
-    alterara_notas();
+
+    do{
+
+        // Limpa a tela do terminal
+        printf("\e[1J\e[H"); 
+
+        // Exibe o menu na tela
+        printf("---------------------------------------\n");
+        printf("### Controle de notas 1.0, 18/10/2026\n");
+        printf("---------------------------------------\n");
+        printf("\n- O que Voce deseja?\n\n");
+        printf("C - Criar um registro;\n");
+        printf("R - Ler um registro;\n");
+        printf("U - Atualizar um registro;\n");
+        printf("D - Deletar um registro;\n");
+        printf("L - Listar todos os registros;\n");
+        printf("Q - Sair;\n");
+        printf(">>");
+
+        scanf(" %c", &opcao);
+
+        switch(opcao){
+            case 'C':
+            case 'c':
+                retorno = insere_notas();                
+                break;
+            case 'R':
+            case 'r':
+                retorno = consulta_notas();
+                break;
+            case 'U':
+            case 'u':
+                retorno = alterara_notas();
+                break;
+            case 'D':
+            case 'd':
+                //retorno = CRUD_Delete();
+                break;
+            case 'L':
+            case 'l':
+                //retorno = CRUD_List();
+                break;
+            case 'Q':
+            case 'q':
+                printf("\nSaindo do programa...\n");
+                break;
+            default:
+                printf("\nOpcao invalida!\n");
+                break;
+        }
+
+    }while(opcao != 'Q' && opcao != 'q'); // O loop continua rodando enquanto a opção não for Q
+
     return 0;
+    
 }
 
 //Verifica se o arquivo de registro de dados existe
@@ -53,6 +107,9 @@ int verifica_arquivo(void){
 int insere_notas(void){
 
     struct Aluno aluno;
+    char opcao;
+
+    while (getchar() != '\n' && getchar() != EOF);
 
     printf("Digite o nome: ");   
     fgets(aluno.nome, nome_len, stdin);
@@ -67,25 +124,36 @@ int insere_notas(void){
 
     printf("O valor da média é: %.2f ", aluno.media);
 
-    FILE *arquivo;
+    printf("\nDeseja salvar o registro? (S/N)");
+    scanf(" %c", &opcao);
 
-    arquivo = fopen("alunos.dat", "ab");
+    if(opcao == 'S' || opcao == 's'){
+        
+        FILE *arquivo;
 
-    if(arquivo == NULL){
-        printf("Erro ao criar o arquivo!\n");
-        return 1;
+        arquivo = fopen("alunos.dat", "ab");
+
+        if(arquivo == NULL){
+            printf("Erro ao criar o arquivo!\n");
+            return 1;
+        }
+
+        //Calcula o id com base no tamanho do arquivo
+        aluno.id = (ftell(arquivo) / sizeof(struct Aluno)) + 1;
+
+        printf("\nID = %d ", aluno.id);
+
+        fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+        fclose(arquivo);
+
+        printf("\nDados salvo com sucesso!\n");
+    }
+    else{
+        printf("\nDados não salvos!\n");
     }
 
-    //Calcula o id com base no tamanho do arquivo
-    aluno.id = (ftell(arquivo) / sizeof(struct Aluno)) + 1;
-
-    fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
-
-    printf("\nDados inseridos com sucesso!\n");
-
-    fclose(arquivo);
-
-   while (getchar() != '\n'); 
+    while (getchar() != '\n'); 
     getchar();
 
     return 0;
@@ -96,6 +164,8 @@ int consulta_notas(void){
 
     struct Aluno aluno;
     int indice;
+
+    while (getchar() != '\n' && getchar() != EOF);
 
     printf("\nQual registro deseja consultar? ");
     scanf("%d", &indice);
@@ -138,6 +208,9 @@ int alterara_notas(void){
 
     struct Aluno aluno;
     int indice;
+    char opcao;
+
+    while (getchar() != '\n' && getchar() != EOF);
 
     printf("\nQual registro deseja alterar? ");
     scanf("%d", &indice);
@@ -167,7 +240,6 @@ int alterara_notas(void){
 
     fclose(arquivo);
 
-
     //Altera o registro
 
     while (getchar() != '\n' && getchar() != EOF);
@@ -185,26 +257,36 @@ int alterara_notas(void){
 
     printf("O valor da média é: %.2f ", aluno.media);
 
-    arquivo = fopen("alunos.dat", "r+b");
+    printf("\nDeseja salvar o registro? (S/N)");
+    scanf(" %c", &opcao);
 
-    if(arquivo == NULL){
-        printf("Erro ao atualizar o arquivo!\n");
-        return 1;
-    }
+    if(opcao == 'S' || opcao == 's'){
 
-    aluno.id = indice;
+        arquivo = fopen("alunos.dat", "r+b");
 
-    if(fseek(arquivo, offset, SEEK_SET) != 0){
-        printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+        if(arquivo == NULL){
+            printf("Erro ao atualizar o arquivo!\n");
+            return 1;
+        }
+
+        aluno.id = indice;
+
+        if(fseek(arquivo, offset, SEEK_SET) != 0){
+            printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+            fclose(arquivo);
+            return 1;
+        }
+
+        fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+        printf("\nDados alterados com sucesso!\n");
+
         fclose(arquivo);
-        return 1;
+
     }
-
-    fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
-
-    printf("\nDados alterados com sucesso!\n");
-
-    fclose(arquivo);
+    else{
+        printf("\nDados não alterados!\n");
+    }
 
     while (getchar() != '\n'); 
     getchar();
