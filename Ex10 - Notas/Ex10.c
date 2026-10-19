@@ -11,6 +11,7 @@
 int verifica_arquivo(void);
 int insere_notas(void);
 int consulta_notas(void);
+int alterara_notas(void);
 
 struct Aluno{
     int id;
@@ -24,6 +25,7 @@ int main(){
     verifica_arquivo();
     insere_notas();
     consulta_notas();
+    alterara_notas();
     return 0;
 }
 
@@ -83,6 +85,10 @@ int insere_notas(void){
 
     fclose(arquivo);
 
+   while (getchar() != '\n'); 
+    getchar();
+
+    return 0;
 }
 
 //Função para consultar registros
@@ -116,6 +122,87 @@ int consulta_notas(void){
     printf("Nota 1: %.2f\n", aluno.nota1);
     printf("Nota 2: %.2f\n", aluno.nota2);
     printf("Media: %.2f\n", aluno.media);
+
+    fclose(arquivo);
+
+    while (getchar() != '\n'); 
+    getchar();
+
+    return 0;
+}
+
+//Função para alterar registros
+int alterara_notas(void){
+
+    //Lê o registro
+
+    struct Aluno aluno;
+    int indice;
+
+    printf("\nQual registro deseja alterar? ");
+    scanf("%d", &indice);
+
+    long offset = (indice - 1) * sizeof(struct Aluno);
+
+    FILE *arquivo = fopen("alunos.dat", "rb");
+    
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    if(fseek(arquivo, offset, SEEK_SET) != 0){
+        printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+        fclose(arquivo);
+        return 1;
+    }
+
+    fread(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+    printf("Id: %d\n", aluno.id);
+    printf("Nome: %s", aluno.nome);
+    printf("Nota 1: %.2f\n", aluno.nota1);
+    printf("Nota 2: %.2f\n", aluno.nota2);
+    printf("Media: %.2f\n", aluno.media);
+
+    fclose(arquivo);
+
+
+    //Altera o registro
+
+    while (getchar() != '\n' && getchar() != EOF);
+
+    printf("Digite o novo nome: ");   
+    fgets(aluno.nome, nome_len, stdin);
+
+    printf("Digite a nova nota 1: ");   
+    scanf("%f", &aluno.nota1);
+
+    printf("Digite a nova nota 2: ");   
+    scanf("%f", &aluno.nota2);
+
+    aluno.media = (aluno.nota1*2 + aluno.nota2*3) / 5;
+
+    printf("O valor da média é: %.2f ", aluno.media);
+
+    arquivo = fopen("alunos.dat", "r+b");
+
+    if(arquivo == NULL){
+        printf("Erro ao atualizar o arquivo!\n");
+        return 1;
+    }
+
+    aluno.id = indice;
+
+    if(fseek(arquivo, offset, SEEK_SET) != 0){
+        printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+        fclose(arquivo);
+        return 1;
+    }
+
+    fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+    printf("\nDados alterados com sucesso!\n");
 
     fclose(arquivo);
 
