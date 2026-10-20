@@ -5,6 +5,7 @@
  * Para limpar: make clean
  *--------------------------------------------------*/
 #include <stdio.h>
+#include <string.h>
 
 #define nome_len 41 //40 string + 1 "\0"
 
@@ -12,6 +13,7 @@ int verifica_arquivo(void);
 int insere_notas(void);
 int consulta_notas(void);
 int alterara_notas(void);
+int deleta_notas(void);
 
 struct Aluno{
     int id;
@@ -62,7 +64,7 @@ int main(){
                 break;
             case 'D':
             case 'd':
-                //retorno = CRUD_Delete();
+                retorno = deleta_notas();
                 break;
             case 'L':
             case 'l':
@@ -286,6 +288,93 @@ int alterara_notas(void){
     }
     else{
         printf("\nDados não alterados!\n");
+    }
+
+    while (getchar() != '\n'); 
+    getchar();
+
+    return 0;
+}
+
+//Função para deletar registros
+int deleta_notas(void){
+
+    //Lê o registro
+
+    struct Aluno aluno;
+    int indice;
+    char opcao;
+
+    while (getchar() != '\n' && getchar() != EOF);
+
+    printf("\nQual registro deseja deletar? ");
+    scanf("%d", &indice);
+
+    long offset = (indice - 1) * sizeof(struct Aluno);
+
+    FILE *arquivo = fopen("alunos.dat", "rb");
+    
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    if(fseek(arquivo, offset, SEEK_SET) != 0){
+        printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+        fclose(arquivo);
+        return 1;
+    }
+
+    fread(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+    printf("Id: %d\n", aluno.id);
+    printf("Nome: %s", aluno.nome);
+    printf("Nota 1: %.2f\n", aluno.nota1);
+    printf("Nota 2: %.2f\n", aluno.nota2);
+    printf("Media: %.2f\n", aluno.media);
+
+    fclose(arquivo);
+
+    //Deleta o registro
+
+    while (getchar() != '\n' && getchar() != EOF);
+
+    printf("\nDeseja deletar o registro? (S/N)");
+    scanf(" %c", &opcao);
+
+    if(opcao == 'S' || opcao == 's'){
+
+        //aluno.nome = '\0';
+        memset(aluno.nome, ' ', sizeof(aluno.nome));
+        aluno.nome[nome_len]= '\n';
+        aluno.nota1 = 0;
+        aluno.nota2 = 0;
+        aluno.media = 0;
+
+        arquivo = fopen("alunos.dat", "r+b");
+
+        if(arquivo == NULL){
+            printf("Erro ao deletar o registro!\n");
+            return 1;
+        }
+
+        aluno.id = indice;
+
+        if(fseek(arquivo, offset, SEEK_SET) != 0){
+            printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+            fclose(arquivo);
+            return 1;
+        }
+
+        fwrite(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+        printf("\nDados deletados com sucesso!\n");
+
+        fclose(arquivo);
+
+    }
+    else{
+        printf("\nDados não deletados!\n");
     }
 
     while (getchar() != '\n'); 
