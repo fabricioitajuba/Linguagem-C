@@ -14,6 +14,7 @@ int insere_notas(void);
 int consulta_notas(void);
 int alterara_notas(void);
 int deleta_notas(void);
+int listar_notas(void);
 
 struct Aluno{
     int id;
@@ -68,7 +69,7 @@ int main(){
                 break;
             case 'L':
             case 'l':
-                //retorno = CRUD_List();
+                retorno = listar_notas();
                 break;
             case 'Q':
             case 'q':
@@ -381,4 +382,61 @@ int deleta_notas(void){
     getchar();
 
     return 0;
+}
+
+//Listra todos os registro na tela
+int listar_notas(void){
+
+    struct Aluno aluno;
+    int indice, q_registros;
+    long offset;
+
+    printf("\nQual a quantidade de registros por tela? ");
+    scanf("%d", &q_registros);
+
+    printf("\e[1J\e[H");
+
+    FILE *arquivo = fopen("alunos.dat", "rb");
+    
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    //Calcula o número máximo de registros
+    fseek(arquivo, 0, SEEK_END);
+    long registros = ftell(arquivo) / sizeof(struct Aluno);
+
+    printf("Quantidade de registros = %ld\n", registros);
+
+    printf("--------------------------------------------------------------------\n");
+    printf("ID |                  NOME                 | NOTA1 | NOTA2 | MEDIA |\n");
+    printf("--------------------------------------------------------------------\n");
+
+    for(indice = 1; indice <= registros; indice ++){
+
+        offset = (indice - 1) * sizeof(struct Aluno);
+        
+        if(fseek(arquivo, offset, SEEK_SET) != 0){
+            printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+            fclose(arquivo);
+            return 1;
+        }
+
+        fread(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+        aluno.nome[strcspn(aluno.nome, "\n")] = '\0';
+        //printf("%03d %s %.2f %.2f %.2f\n", aluno.id, aluno.nome, aluno.nota1, aluno.nota2, aluno.media);
+        printf("%03d %-40s %6.2f %6.2f %6.2f\n", aluno.id, aluno.nome, aluno.nota1, aluno.nota2, aluno.media);
+    } 
+
+    fclose(arquivo);
+
+    printf("\nPressione qualquer tecla para continuar!\n");
+
+    while (getchar() != '\n'); 
+    getchar();
+
+    return 0;
+
 }
