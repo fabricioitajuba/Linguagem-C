@@ -9,12 +9,24 @@
 
 #define nome_len 41 //40 string + 1 "\0"
 
+// Definição dos códigos de cores para o terminal
+#define RED     "\033[0;31m"
+#define GREEN   "\033[0;32m"
+#define YELLOW  "\033[0;33m"
+#define BLUE    "\033[0;34m"
+#define RESET   "\033[0m"
+#define CIAN    "\033[0;36m"
+#define BRANCO  "\033[0;37m"
+#define BG_BLACK_TOTAL "\033[40m\033[37m"
+#define CLEAR_SCREEN   "\033[2J\033[H"
+
 int verifica_arquivo(void);
 int insere_notas(void);
 int consulta_notas(void);
 int alterara_notas(void);
 int deleta_notas(void);
 int listar_notas(void);
+int procurar_notas(void);
 
 struct Aluno{
     int id;
@@ -28,12 +40,15 @@ int main(){
     char opcao;
     int retorno;
 
+    //printf(BG_BLACK_TOTAL CLEAR_SCREEN);
+
     verifica_arquivo();
 
     do{
 
         // Limpa a tela do terminal
-        printf("\e[1J\e[H"); 
+        //printf("\e[1J\e[H"); 
+        printf(BG_BLACK_TOTAL CLEAR_SCREEN);
 
         // Exibe o menu na tela
         printf("---------------------------------------\n");
@@ -45,6 +60,7 @@ int main(){
         printf("U - Atualizar um registro;\n");
         printf("D - Deletar um registro;\n");
         printf("L - Listar todos os registros;\n");
+        printf("P - Procurar registros;\n");
         printf("Q - Sair;\n");
         printf(">>");
 
@@ -55,26 +71,37 @@ int main(){
             case 'c':
                 retorno = insere_notas();                
                 break;
+
             case 'R':
             case 'r':
                 retorno = consulta_notas();
                 break;
+
             case 'U':
             case 'u':
                 retorno = alterara_notas();
                 break;
+
             case 'D':
             case 'd':
                 retorno = deleta_notas();
                 break;
+
             case 'L':
             case 'l':
                 retorno = listar_notas();
                 break;
+
+            case 'P':
+            case 'p':
+                retorno = procurar_notas();
+                break;  
+
             case 'Q':
             case 'q':
                 printf("\nSaindo do programa...\n");
                 break;
+
             default:
                 printf("\nOpcao invalida!\n");
                 break;
@@ -391,6 +418,8 @@ int listar_notas(void){
     int indice, q_registros;
     long offset;
 
+    while (getchar() != '\n' && getchar() != EOF);
+
     printf("\nQual a quantidade de registros por tela? ");
     scanf("%d", &q_registros);
 
@@ -439,4 +468,74 @@ int listar_notas(void){
 
     return 0;
 
+}
+
+//Procura registros
+int procurar_notas(void){
+
+    struct Aluno aluno;
+    char termo_busca[50];
+    int indice, q_reg;
+    long offset;
+    
+
+    printf("\nProcurar registros...\n");
+
+    while (getchar() != '\n' && getchar() != EOF);
+
+    printf("\nDigite o nome para busca: ");
+    fgets(termo_busca, sizeof(termo_busca), stdin);
+    termo_busca[strcspn(termo_busca, "\n")] = '\0';
+
+
+    printf("\e[1J\e[H");
+
+    FILE *arquivo = fopen("alunos.dat", "rb");
+    
+    if(arquivo == NULL){
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    //Calcula o número máximo de registros
+    fseek(arquivo, 0, SEEK_END);
+    long registros = ftell(arquivo) / sizeof(struct Aluno);
+
+    printf("--------------------------------------------------------------------\n");
+    printf("ID |                  NOME                 | NOTA1 | NOTA2 | MEDIA |\n");
+    printf("--------------------------------------------------------------------\n");
+
+    q_reg = 0;
+
+    for(indice = 1; indice <= registros; indice ++){
+
+        offset = (indice - 1) * sizeof(struct Aluno);
+        
+        if(fseek(arquivo, offset, SEEK_SET) != 0){
+            printf("Erro ao posicionar no arquivo (Linha inexistente).\n");
+            fclose(arquivo);
+            return 1;
+        }
+
+        fread(&aluno, sizeof(struct Aluno), 1, arquivo);
+
+        // Buscando a string
+        if(strstr(aluno.nome, termo_busca) != NULL){
+            aluno.nome[strcspn(aluno.nome, "\n")] = '\0';
+            printf("%03d %-40s %6.2f %6.2f %6.2f\n", aluno.id, aluno.nome, aluno.nota1, aluno.nota2, aluno.media);
+            q_reg++;
+        }
+    } 
+
+    fclose(arquivo);
+
+    printf(BG_BLACK_TOTAL YELLOW "\nQuantidade de registros salvos = %ld", registros);
+    printf(BG_BLACK_TOTAL GREEN "\nQuantidade de registros achados = %d\n", q_reg);
+
+    printf(BG_BLACK_TOTAL RESET"\nPressione qualquer tecla para continuar!\n");
+
+    //while (getchar() != '\n'); 
+    getchar();
+
+    return 0;
 }
