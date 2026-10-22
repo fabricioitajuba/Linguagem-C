@@ -415,13 +415,14 @@ int deleta_notas(void){
 int listar_notas(void){
 
     struct Aluno aluno;
-    int indice, q_registros;
+    int indice, q_reg, i;
     long offset;
-
-    while (getchar() != '\n' && getchar() != EOF);
+    char opt;
 
     printf("\nQual a quantidade de registros por tela? ");
-    scanf("%d", &q_registros);
+    scanf("%d", &q_reg);
+
+    while (getchar() != '\n' && getchar() != EOF);
 
     printf("\e[1J\e[H");
 
@@ -437,10 +438,11 @@ int listar_notas(void){
     long registros = ftell(arquivo) / sizeof(struct Aluno);
 
     printf("Quantidade de registros = %ld\n", registros);
-
     printf("--------------------------------------------------------------------\n");
     printf("ID |                  NOME                 | NOTA1 | NOTA2 | MEDIA |\n");
     printf("--------------------------------------------------------------------\n");
+
+    i = 0;
 
     for(indice = 1; indice <= registros; indice ++){
 
@@ -455,15 +457,32 @@ int listar_notas(void){
         fread(&aluno, sizeof(struct Aluno), 1, arquivo);
 
         aluno.nome[strcspn(aluno.nome, "\n")] = '\0';
-        //printf("%03d %s %.2f %.2f %.2f\n", aluno.id, aluno.nome, aluno.nota1, aluno.nota2, aluno.media);
         printf("%03d %-40s %6.2f %6.2f %6.2f\n", aluno.id, aluno.nome, aluno.nota1, aluno.nota2, aluno.media);
+
+        i++;
+        if(i == q_reg){
+            
+            i = 0;
+
+            printf("\nPressione qualquer tecla para continuar (Q para sair)...\n");
+            scanf("%c", &opt);
+            
+            if(opt == 'Q' || opt == 'q'){
+                break;
+            }
+            
+            printf("\e[1J\e[H");
+            printf("Quantidade de registros = %ld\n", registros);
+            printf("--------------------------------------------------------------------\n");
+            printf("ID |                  NOME                 | NOTA1 | NOTA2 | MEDIA |\n");
+            printf("--------------------------------------------------------------------\n");
+
+        }
     } 
 
     fclose(arquivo);
 
     printf("\nPressione qualquer tecla para continuar!\n");
-
-    while (getchar() != '\n'); 
     getchar();
 
     return 0;
@@ -533,8 +552,6 @@ int procurar_notas(void){
     printf(BG_BLACK_TOTAL GREEN "\nQuantidade de registros achados = %d\n", q_reg);
 
     printf(BG_BLACK_TOTAL RESET"\nPressione qualquer tecla para continuar!\n");
-
-    //while (getchar() != '\n'); 
     getchar();
 
     return 0;
