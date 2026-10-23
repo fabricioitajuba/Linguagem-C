@@ -1,0 +1,51 @@
+A alocação dinâmica de memória em C funciona permitindo que o seu programa 
+solicite espaço de RAM em tempo de execução, e não em tempo de compilação. 
+Isso significa que você pode decidir o tamanho de um vetor ou estrutura 
+enquanto o programa já está rodando, evitando desperdícios ou falta de espaço.
+
+Essa memória é alocada em uma região especial chamada Heap (ou monte) e o seu 
+gerenciamento é feito de forma manual pelo programador por meio de ponteiros 
+e funções da biblioteca <stdlib.h>.
+
+As 4 Funções Principais (<stdlib.h>)
+
+Função	   O que ela faz?	                        Características principais
+malloc()   Aloca um bloco contíguo de memória.	        Contém lixo de memória (não zera os bytes).
+calloc()   Aloca memória para um array de elementos.	Inicializa todos os bytes com zero.
+realloc()  Altera o tamanho de um bloco já alocado.	Pode mover o bloco para outro lugar se precisar de espaço contíguo.
+free()	   Libera o bloco de memória reservado.	        Obrigatório para evitar vazamento de memória (memory leak).
+
+
+Cuidados Essenciais
+
+1. Checar por NULL: Se o sistema operacional não tiver memória livre suficiente, 
+o malloc ou calloc retornará NULL. Tentar usar um ponteiro nulo causará um 
+travamento (Segmentation Fault).
+
+2. Vazamento de Memória (Memory Leak): Memória alocada na Heap não é liberada 
+automaticamente quando a função acaba. Se você não usar o free(), ela ficará presa 
+até o programa fechar, o que pode consumir toda a RAM do sistema em aplicações longas.
+
+3. Uso pós-liberação: Nunca tente ler ou escrever em um ponteiro que já passou pelo free().
+
+
+Aplicar a alocação dinâmica em estruturas (structs) segue a mesma lógica dos tipos básicos, 
+mas com um detalhe muito importante: para acessar os campos da estrutura através de um ponteiro, 
+usamos o operador seta (->) em vez do operador ponto (.).
+
+A alocação dinâmica é a base para criar estruturas de dados complexas, como listas encadeadas, 
+árvores e grafos, onde os nós são criados e destruídos sob demanda.
+
+
+O Grande Cuidado: Structs com Ponteiros Internos
+
+Se a sua struct contiver ponteiros dentro dela (por exemplo, uma string dinâmica como char 
+*nome; em vez de um array fixo char nome[50];), você precisará fazer a alocação em camadas:
+
+1. Primeiro, aloca a memória para a struct em si.
+
+2. Depois, aloca a memória para cada ponteiro interno dela.
+
+3. Para liberar: Faz o inverso. Libera primeiro os ponteiros de dentro e, por último, a 
+struct. Se você liberar a struct primeiro, perderá o endereço dos ponteiros internos, 
+gerando um vazamento de memória incorrigível.
