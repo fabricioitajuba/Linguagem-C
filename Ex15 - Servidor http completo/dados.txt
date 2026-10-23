@@ -1,0 +1,6 @@
+Dados recebidos: nome=Fabricio+Ribeiro&mensagem=teste
+-----------------------
+Dados recebidos: nome=teste+2&mensagem=teste+2
+-----------------------
+Dados recebidos: nome=teste+3&mensagem=teste+3
+-----------------------

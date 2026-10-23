@@ -1,0 +1,105 @@
+http://localhost:8080
+
+Para transformar o seu servidor HTTP em C em um serviço em segundo plano no Linux, 
+a forma padrão e mais robusta é utilizando o systemd. O systemd garantirá que o seu 
+programa inicialize automaticamente junto com o sistema operacional, reinicie sozinho 
+caso sofra uma queda inesperada e gerencie os logs de forma centralizada.
+
+Siga o passo a passo abaixo para configurar a unidade de serviço:
+
+Passo 1: Organizar os Arquivos
+
+Para que o serviço funcione de forma organizada e estável, evite rodá-lo diretamente 
+de pastas pessoais (como /home/usuario). Mova o binário compilado e o arquivo HTML 
+para uma pasta dedicada no sistema.
+
+- Crie uma pasta para o seu servidor:
+sudo mkdir -p /var/www/meu-servidor
+
+- Mova o seu executável (servidor) e o arquivo index.html para lá.
+
+- Garanta que o programa tenha permissão de execução:
+sudo chmod +x /var/www/meu-servidor/servidor
+
+(Nota: O arquivo dados.txt será gerado automaticamente nessa mesma pasta /var/www/meu-servidor 
+assim que o primeiro POST for enviado).
+
+
+Passo 2: Criar o Arquivo do Serviço .service
+
+Os arquivos de configuração do systemd ficam armazenados no diretório /etc/systemd/system/. 
+Crie um arquivo para o seu servidor utilizando um editor de texto (como o nano):
+
+Cole o seguinte conteúdo dentro dele:
+
+[Unit]
+Description=Meu Servidor HTTP customizado em C
+After=network.target
+
+[Service]
+Type=simple
+# Define a pasta onde o programa será executado (essencial para ele achar o index.html externo)
+WorkingDirectory=/var/www/meu-servidor
+# O comando exato para iniciar o seu programa
+ExecStart=/var/www/meu-servidor/servidor
+# Estratégia de reinicialização: se o programa cair por qualquer motivo, reinicia em 5 segundos
+Restart=always
+RestartSec=5
+# Define o usuário que rodará o programa (por segurança, evite usar root diretamente)
+User=root
+
+[Install]
+WantedBy=multi-user.target
+
+Salve e feche o arquivo (No nano, pressione Ctrl + O, depois Enter para salvar, e Ctrl + X para sair).
+
+
+Passo 3: Registrar e Iniciar o Serviço
+
+Com o arquivo criado, você precisa avisar ao Linux que existe um novo serviço disponível e comandá-lo 
+usando a ferramenta systemctl:
+
+1. Atualize o systemd para ler o novo arquivo criado:
+
+sudo systemctl daemon-reload
+
+2. Ative o serviço para que ele inicie automaticamente sempre que o Linux ligar ou reiniciar:
+
+sudo systemctl enable meu-servidor.service
+
+3. Inicie o serviço imediatamente
+
+sudo systemctl start meu-servidor.service
+
+
+
+Comandos Úteis de Gerenciamento
+
+A partir de agora, você gerencia o seu programa em C como qualquer outro serviço nativo do sistema 
+operando os seguintes comandos:
+
+- Verificar se ele está rodando (Status):
+
+sudo systemctl status meu-servidor
+
+(Se tudo estiver certo, você verá uma linha verde escrito active (running)).
+
+- Parar o servidor:
+
+sudo systemctl stop meu-servidor
+
+- Reiniciar o servidor (útil se você alterar o código C e compilá-lo novamente):
+
+sudo systemctl restart meu-servidor
+
+- Acompanhar logs em tempo real:
+
+Tudo o que o seu programa exibir usando printf() ou perror() será capturado pelo gerenciador 
+de logs do Linux. Você pode acompanhar digitando:
+
+sudo journalctl -u meu-servidor.service -f
+
+Para entender com mais detalhes as diretivas de configuração aplicadas ou explorar outras 
+funcionalidades deste gerenciador, consulte a documentação oficial sobre as Unidades Systemd no Linux.
+
+
