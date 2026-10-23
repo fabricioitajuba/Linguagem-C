@@ -1,4 +1,4 @@
-Nome = Ex13b
+Nome = Ex13f1
 # Variáveis para o compilador e flags
 CC = gcc
 CFLAGS = -Wall -Wextra -O2

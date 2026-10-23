@@ -49,3 +49,103 @@ Se a sua struct contiver ponteiros dentro dela (por exemplo, uma string dinâmic
 3. Para liberar: Faz o inverso. Libera primeiro os ponteiros de dentro e, por último, a 
 struct. Se você liberar a struct primeiro, perderá o endereço dos ponteiros internos, 
 gerando um vazamento de memória incorrigível.
+
+
+A função realloc em C é usada para alterar o tamanho de um bloco de memória que já foi 
+alocado dinamicamente (seja por malloc ou calloc) [1]. Ela permite aumentar ou diminuir 
+o espaço disponível sem perder os dados que já estavam guardados ali [1].
+
+Abaixo, veja como ela funciona e o jeito correto de usá-la.
+
+
+A função realloc em C é usada para alterar o tamanho de um bloco de memória que já foi 
+alocado dinamicamente (seja por malloc ou calloc) [1]. Ela permite aumentar ou diminuir 
+o espaço disponível sem perder os dados que já estavam guardados ali [1].
+Abaixo, veja como ela funciona e o jeito correto de usá-la.
+
+1. Sintaxe da Função
+
+Para usar o realloc, você precisa incluir a biblioteca <stdlib.h> [1].
+
+void* realloc(void* ptr, size_t size);
+
+• ptr: O ponteiro para o bloco de memória original [1].
+• size: O novo tamanho total que você deseja (em bytes) [1].
+
+
+2. O Jeito Correto de Usar (Com Segurança)
+
+O erro mais comum ao usar realloc é atribuir o resultado diretamente à variável original 
+(ex: ptr = realloc(ptr, novo_tamanho);). Não faça isso. Se o realloc falhar, ele retornará 
+NULL e você perderá o endereço da memória antiga, gerando um vazamento de memória (memory leak).
+
+
+3. O que acontece por trás dos panos?
+
+Quando você chama o realloc, o sistema operacional tenta fazer uma das três coisas:
+
+1. Expandir no mesmo lugar: Se houver espaço livre logo após o bloco atual, ele apenas "estica" 
+o bloco e mantém o mesmo endereço.
+
+2. Mover para um novo lugar: Se não houver espaço grudado ali, ele acha um novo local na memória 
+grande o suficiente, copia os dados antigos automaticamente, libera o bloco antigo e retorna o 
+novo endereço.
+
+3. Falhar: Se não houver memória suficiente no sistema, ele retorna NULL [1]. O bloco original 
+continua existindo e intocado no mesmo lugar [1].
+
+4. Casos Especiais
+
+• realloc(NULL, tamanho): Se você passar um ponteiro nulo, o realloc se comporta exatamente como 
+um malloc(tamanho) [1].
+• realloc(ptr, 0): Na maioria dos sistemas modernos, passar tamanho zero pode liberar a memória 
+(como um free) ou retornar um ponteiro especial que não deve ser lido [1]. O ideal para liberar 
+memória é usar sempre o free(ptr).
+
+💡 Resumo de Boas Práticas
+
+• Sempre use um ponteiro temporário para receber o retorno do realloc.
+• Sempre multiplique a quantidade de itens pelo sizeof(tipo) (ex: 5 * sizeof(int)).
+• Nunca tente acessar os novos índices antes de verificar se o retorno não foi NULL.
+
+A quantidade total de memória fica exatamente igual ao novo tamanho total que você solicitou no 
+segundo argumento da função, e não a soma do tamanho antigo com o novo.
+
+Se você pedir realloc(ptr, novo_tamanho), o bloco final passará a ter espaço para conter exatamente 
+o novo_tamanho informado.
+
+Veja os dois cenários possíveis:
+
+
+1. Quando você aumenta o tamanho
+
+Se você tinha espaço para 3 elementos e pede uma realocação para 5 elementos:
+
+• O tamanho total final será de 5 elementos.
+• Os 3 primeiros elementos continuam intactos com os dados que você já tinha guardado.
+• Os 2 novos elementos finais vêm com conteúdo lixo (valores residuais da memória). 
+  Você precisa inicializá-los manualmente.
+
+2. Quando você diminui o tamanho
+
+Se você tinha espaço para 5 elementos e pede uma realocação para 2 elementos:
+• O tamanho total final será de 2 elementos.
+• Os 2 primeiros elementos são preservados.
+• Os 3 elementos restantes são descartados e liberados de volta para o sistema. 
+
+Atenção: tentar acessar os índices antigos depois disso causará um erro grave no 
+seu programa (Uso de memória após liberação / Segmentation Fault).
+
+
+Exemplo Prático de Medição
+
+Se você quiser ver o tamanho total mudar na prática, o cálculo em bytes muda assim:
+
+// Alocação Inicial: 3 inteiros (3 * 4 bytes = 12 bytes no total)
+int *ptr = malloc(3 * sizeof(int)); 
+
+// Realocação: Mudando a quantidade total para 10 inteiros
+// O tamanho total agora NÃO É 13, o tamanho total FINAL passa a ser 10 inteiros (40 bytes no total)
+int *temp = realloc(ptr, 10 * sizeof(int)); 
+
+
