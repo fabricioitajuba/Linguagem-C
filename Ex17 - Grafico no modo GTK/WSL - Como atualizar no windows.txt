@@ -1,0 +1,14 @@
+Pesquisar e digite "power shell"
+
+- para instalar o WSL:
+> wsl --install
+
+- para atualizar:
+> wsl --update
+
+- para reiniciar:
+> wsl --shutdown
+
+
+- saber a versão do linux
+$ lsb_release -a

@@ -1,0 +1,26 @@
+1. Como Instalar o GTK
+
+Antes de compilar o seu código, instale o kit de desenvolvimento do GTK no seu 
+sistema operacional:
+
+- Linux (Ubuntu/Debian):
+
+sudo apt update
+sudo apt install build-essential libgtk-4-dev pkg-config
+
+
+- Escrever e rodar seu código
+
+Com o arquivo main.c salvo na pasta do seu Linux, a compilação é idêntica à nativa:
+
+gcc main.c -o meu_programa `pkg-config --cflags --libs gtk4`
+./meu_programa
+
+
+gcc Ex17.c -o Ex17 `pkg-config --cflags --libs gtk4`
+./Ex17
+
+
+- Material:
+https://toshiocp.github.io/Gtk4-tutorial/
+https://github.com/ToshioCP/Gtk4-tutorial/tree/main
